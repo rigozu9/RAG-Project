@@ -1,6 +1,6 @@
 import pandas as pd
 
-df = pd.read_csv("superstore.csv", encoding="latin1")
+df = pd.read_csv("data/superstore.csv", encoding="latin1")
 
 def row_to_text(row):
     return (
@@ -19,6 +19,6 @@ def row_to_text(row):
 df_text = df[["Order ID"]].copy()
 df_text["text"] = df.apply(row_to_text, axis=1)
 
-df_text.to_csv("transactions_with_text.csv", index=False)
+# df_text.to_csv("data/transactions_with_text.csv", index=False)
 
 print(df_text.head())

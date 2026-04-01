@@ -1,6 +1,6 @@
 import pandas as pd
 
-df = pd.read_csv("superstore.csv", encoding="latin1")
+df = pd.read_csv("data/superstore.csv", encoding="latin1")
 
 df["Order Date"] = pd.to_datetime(df["Order Date"])
 # print(df["Order Date"].head())
@@ -33,4 +33,4 @@ monthly_summary["text"] = monthly_summary.apply(monthly_summary_to_text, axis=1)
 
 print(monthly_summary[["YearMonth", "text"]].head())
 
-monthly_summary.to_csv("monthly_summaries.csv", index=False)
+# monthly_summary.to_csv("data/monthly_summaries.csv", index=False)
