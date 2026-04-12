@@ -1,3 +1,5 @@
 .DS_Store
 *.csv
 data/
+chroma_db/
+__pycache__/
