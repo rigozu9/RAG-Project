@@ -15,10 +15,9 @@ def row_to_text(row):
         f"Discount: {row['Discount']:.2f}, Profit: ${row['Profit']:.2f}."
     )
 
-# Add order id aswell as text to easier link to og data if needed
-df_text = df[["Order ID"]].copy()
+df_text = df[["Row ID", "Order ID"]].copy()
 df_text["text"] = df.apply(row_to_text, axis=1)
 
-# df_text.to_csv("data/transactions_with_text.csv", index=False)
+df_text.to_csv("data/transactions_with_text.csv", index=False)
 
 print(df_text.head())
