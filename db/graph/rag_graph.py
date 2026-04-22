@@ -10,16 +10,22 @@ OLLAMA_MODEL = "llama3:latest"
 def build_rag_graph(regions, categories, segments):
     def extract_filters_node(state):
         query = state["query"]
-
-        filters = extract_metadata_filters(
+        previous_filters = state.get("previous_filters", {})
+        current_filters = extract_metadata_filters(
             query,
             regions,
             categories,
             segments
         )
 
+        merged_filters = previous_filters.copy()
+        merged_filters.update(current_filters)
+        print("Current filters:", current_filters)
+        print("Merged filters:", merged_filters)
+
         return {
-            "filters": filters
+            "filters": merged_filters,
+            "previous_filters": merged_filters
         }
 
     def retrieve_context_node(state):
@@ -53,6 +59,7 @@ def build_rag_graph(regions, categories, segments):
             Use only the context below to answer the user's question.
             Use the conversation history only to understand follow-up questions.
             If the context does not contain enough information, say so.
+            Use filters rather than previous filters when they are available.
 
             Context:
             {context}
