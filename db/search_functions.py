@@ -9,6 +9,7 @@ MODEL_NAME = "all-MiniLM-L6-v2"
 client = chromadb.PersistentClient(path=CHROMA_PATH)
 collection = client.get_collection(name=COLLECTION_NAME)
 summary_collection = client.get_collection(name=SUMMARY_COLLECTION_NAME)
+model = SentenceTransformer(MODEL_NAME)
 
 def get_unique_metadata_values(df, column_name):
     values = df[column_name].dropna().unique().tolist()
@@ -48,7 +49,7 @@ def build_where_filter(filters):
     return {"$and": conditions}
 
 def similarity_search(query, top_k, filters=None):
-    query_embedding = SentenceTransformer(MODEL_NAME).encode(query).tolist()
+    query_embedding = model.encode(query).tolist()
 
     where_filter = build_where_filter(filters)
     print("Chroma where filter:", where_filter)
@@ -80,7 +81,7 @@ def similarity_search(query, top_k, filters=None):
     return matches
 
 def summary_similarity_search(query, top_k):
-    query_embedding = SentenceTransformer(MODEL_NAME).encode(query).tolist()
+    query_embedding = model.encode(query).tolist()
 
     results = summary_collection.query(
         query_embeddings=[query_embedding],
@@ -99,3 +100,20 @@ def summary_similarity_search(query, top_k):
         })
 
     return matches
+
+def combined_similarity_search(query, transaction_top_k=5, summary_top_k=3, filters=None):
+    summary_matches = summary_similarity_search(
+        query,
+        top_k=summary_top_k
+    )
+
+    transaction_matches = similarity_search(
+        query,
+        top_k=transaction_top_k,
+        filters=filters
+    )
+
+    return {
+        "summaries": summary_matches,
+        "transactions": transaction_matches
+    }
