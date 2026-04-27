@@ -21,6 +21,12 @@ SUMMARY_FILES = [
         "metadata_key": "region"
     },
     {
+        "path": "data/yearly_summaries.csv",
+        "summary_type": "yearly",
+        "key_column": "Year",
+        "metadata_key": "year"
+    },
+    {
         "path": "data/monthly_summaries.csv",
         "summary_type": "monthly",
         "key_column": "YearMonth",
@@ -52,6 +58,9 @@ def load_summary_rows():
 
             if summary_file["summary_type"] == "monthly":
                 metadata["year"] = str(row["YearMonth"]).split("-")[0]
+
+            if summary_file["summary_type"] == "yearly":
+                metadata["year"] = str(int(row["Year"]))
 
             summary_rows.append({
                 "id": f"{summary_file['summary_type']}_{row[summary_file['key_column']]}",
