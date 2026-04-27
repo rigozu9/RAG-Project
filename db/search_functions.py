@@ -3,10 +3,12 @@ from sentence_transformers import SentenceTransformer
 
 CHROMA_PATH = "chroma_db"
 COLLECTION_NAME = "sales_chunks_500"
+SUMMARY_COLLECTION_NAME = "sales_summaries"
 MODEL_NAME = "all-MiniLM-L6-v2"
 
 client = chromadb.PersistentClient(path=CHROMA_PATH)
 collection = client.get_collection(name=COLLECTION_NAME)
+summary_collection = client.get_collection(name=SUMMARY_COLLECTION_NAME)
 
 def get_unique_metadata_values(df, column_name):
     values = df[column_name].dropna().unique().tolist()
@@ -64,6 +66,27 @@ def similarity_search(query, top_k, filters=None):
             n_results=top_k,
             include=["documents", "metadatas", "distances"]
         )
+
+    matches = []
+
+    for i in range(len(results["ids"][0])):
+        matches.append({
+            "id": results["ids"][0][i],
+            "document": results["documents"][0][i],
+            "metadata": results["metadatas"][0][i],
+            "distance": results["distances"][0][i]
+        })
+
+    return matches
+
+def summary_similarity_search(query, top_k):
+    query_embedding = SentenceTransformer(MODEL_NAME).encode(query).tolist()
+
+    results = summary_collection.query(
+        query_embeddings=[query_embedding],
+        n_results=top_k,
+        include=["documents", "metadatas", "distances"]
+    )
 
     matches = []
 
